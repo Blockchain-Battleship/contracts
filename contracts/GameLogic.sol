@@ -96,12 +96,14 @@ contract GameLogic is ReentrancyGuard, IDataStorageSchema
             uint8 maxTile = startingPosition + (incrementer * (sizeOfShip-1));
             
             
-            require (maxTile <= gridSquare, "Ship can not be placed outside the grid");
+            require (maxTile <= gridSquare && startingPosition >= 1, "Ship can not be placed outside the grid");
             
             if(axis == AxisType.X)
             {
-                uint lowerLimitFactor = (startingPosition - (startingPosition % gridDimensionX)) / gridDimensionX;
-                uint upperLimitFactor = (maxTile - (maxTile % gridDimensionX)) / gridDimensionX;
+                uint upperFactor = maxTile - 1;
+                uint lowerFactor = startingPosition - 1;
+                uint lowerLimitFactor = (lowerFactor - (lowerFactor % gridDimensionX)) / gridDimensionX;
+                uint upperLimitFactor = (upperFactor - (upperFactor % gridDimensionX)) / gridDimensionX;
                 require (lowerLimitFactor == upperLimitFactor, "Invalid Ship placement");
             }
 
