@@ -95,16 +95,18 @@ contract GameLogic is ReentrancyGuard, IDataStorageSchema
             uint8 incrementer = axis == AxisType.X ? 1 : gridDimensionX;
             uint8 maxTile = startingPosition + (incrementer * (sizeOfShip-1));
             
-            
+            //Ensure the ship is within bounds in the y Axis
             require (maxTile <= gridSquare && startingPosition >= 1, "Ship can not be placed outside the grid");
             
+            //Ensure the at the x axis is within the board
+            (uint xMin, uint yMin) = getCoordinatesFromTileIndex(startingPosition);
+            (uint xMax, uint yMax) = getCoordinatesFromTileIndex(maxTile);
+
             if(axis == AxisType.X)
             {
-                uint upperFactor = maxTile - 1;
-                uint lowerFactor = startingPosition - 1;
-                uint lowerLimitFactor = (lowerFactor - (lowerFactor % gridDimensionX)) / gridDimensionX;
-                uint upperLimitFactor = (upperFactor - (upperFactor % gridDimensionX)) / gridDimensionX;
-                require (lowerLimitFactor == upperLimitFactor, "Invalid Ship placement");
+                require(yMin == yMax, "Invalid Ship Position on X Axis");
+            }else{
+                require(xMin == xMax, "Invalid Ship Position on Y Axis");
             }
 
             
@@ -273,6 +275,16 @@ contract GameLogic is ReentrancyGuard, IDataStorageSchema
         return shipPositionMapping[positionKey];
     }
     
+    function getCoordinatesFromTileIndex(uint tileIndex) public pure returns(uint x, uint y)
+    {
+        y = ceil(tileIndex, 10);
+        x = tileIndex % 10;
+        x = x == 0 ? 10 : x;
+    }
+
+    function ceil(uint a, uint m) public pure returns (uint) {
+        return ((a + m - 1) / m);
+    }
     
 
      
